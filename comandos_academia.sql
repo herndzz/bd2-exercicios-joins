@@ -1,4 +1,4 @@
-# Exercícios
+# ~~~~~~~~~~~~~~~~~~~~~~~~~ [ Exercícios ] ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # 1 - Crie uma query que retorne uma coluna nomeada como 'Nome Completo' com o nome completo das pessoas associadas a academia, uma coluna com o logradouro e outra com o número. Utilize as tabelas Pessoa_Associada e Endereco.
 SELECT 
@@ -122,3 +122,93 @@ LEFT JOIN
 LEFT JOIN 
     Horario AS H 
     ON A.Horario_ID = H.Horario_ID;
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~ [ Bônus ] ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# 1 - Mostre o nome da pessoa treinadora e a modalidade em que atua, de modo que a mesma informação não se repita na tabela. Use as tabelas Pessoa_Treinadora, Aula, Modalidade.
+SELECT DISTINCT
+    CONCAT(PT.Nome, ' ', PT.Sobrenome) AS `Nome Treinadora`,
+    M.Nome_modalidade AS `Modalidade`
+FROM
+    Pessoa_Treinadora AS PT
+INNER JOIN
+    Aula AS A 
+    ON PT.Pessoa_Treinadora_ID = A.Pessoa_Treinadora_ID
+INNER JOIN
+    Modalidade AS M 
+    ON A.Modalidade_ID = M.Modalidade_ID;
+
+# 2 - Retorne o nome da pessoa treinadora e o período em que atua. Utilize as tabelas Pessoa_Treinadora, Aula, Horario.
+SELECT
+    CONCAT(PT.Nome, ' ', PT.Sobrenome) AS `Nome Treinadora`,
+    H.Periodo
+FROM
+    Pessoa_Treinadora AS PT
+INNER JOIN
+    Aula AS A 
+    ON PT.Pessoa_Treinadora_ID = A.Pessoa_Treinadora_ID
+INNER JOIN
+    Horario AS H 
+    ON A.Horario_ID = H.Horario_ID;
+
+# 3 - Retorne o nome de todas pessoas treinadoras e uma coluna com o nome 'Horario', mostrando o período em que a pessoa atua. Caso não tenha um horário estipulado, mostre 'EVENTUAL'. Por fim, ordene em forma alfabética-invertida pelo nome da pessoa. Utilize as tabelas Pessoa_Treinadora, Aula, Horario.
+SELECT
+    CONCAT(PT.Nome, ' ', PT.Sobrenome) AS `Nome Treinadora`,
+    IFNULL(H.Periodo, 'EVENTUAL') AS `Horario`
+FROM
+    Pessoa_Treinadora AS PT
+LEFT JOIN
+    Aula AS A 
+    ON PT.Pessoa_Treinadora_ID = A.Pessoa_Treinadora_ID
+LEFT JOIN
+    Horario AS H 
+    ON A.Horario_ID = H.Horario_ID
+ORDER BY
+    `Nome Treinadora` DESC;
+
+# 4 - Retorne o nome da modalidade e a quantidade de pessoas que a praticam, nomeie essa coluna como 'Pessoas' e ordena por essa coluna em ordem crescente. Utilize as Tabelas Modalidade e Treino.
+SELECT
+    M.Nome_modalidade AS `Modalidade`,
+    COUNT(T.Pessoa_Associada_ID) AS `Pessoas`
+FROM
+    Modalidade AS M
+LEFT JOIN
+    Treino AS T 
+    ON M.Modalidade_ID = T.Modalidade_ID
+GROUP BY
+    M.Nome_modalidade
+ORDER BY
+    `Pessoas` ASC;
+
+# 5 - Retorne o nome da pessoa treinadora e a quantidade de pessoas associadas que participam de suas aulas, nomeie essa coluna como 'Pessoas'. Utilize as tabelas Pessoa_Treinadora, Treino, Aula.
+SELECT
+    CONCAT(PT.Nome, ' ', PT.Sobrenome) AS `Nome Treinadora`,
+    COUNT(T.Pessoa_Associada_ID) AS `Pessoas`
+FROM
+    Pessoa_Treinadora AS PT
+INNER JOIN
+    Aula AS A 
+    ON PT.Pessoa_Treinadora_ID = A.Pessoa_Treinadora_ID
+INNER JOIN
+    Treino AS T 
+    ON A.Modalidade_ID = T.Modalidade_ID
+GROUP BY
+    PT.Pessoa_Treinadora_ID;
+
+# 6 - Escreva uma query que retorne o nome da pessoa associada e o nome da pessoa treinadora responável pelo seu treino de acordo com a modalidade e o horário.
+SELECT
+    CONCAT(PA.Nome, ' ', PA.Sobrenome) AS `Nome Associado`,
+    CONCAT(PT.Nome, ' ', PT.Sobrenome) AS `Nome Treinadora`
+FROM
+    Pessoa_Associada AS PA
+INNER JOIN
+    Treino AS T 
+    ON PA.Pessoa_Associada_ID = T.Pessoa_Associada_ID
+INNER JOIN
+    Aula AS A 
+    ON T.Modalidade_ID = A.Modalidade_ID
+    AND T.Horario_ID = A.Horario_ID
+INNER JOIN
+    Pessoa_Treinadora AS PT 
+    ON A.Pessoa_Treinadora_ID = PT.Pessoa_Treinadora_ID;
+    
